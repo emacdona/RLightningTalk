@@ -1,27 +1,64 @@
 library(sound)
+
+# Turkish March -- Mozart
 sample   <- loadSample('tm.wav')
 sFreq    <- rate(sample)
 nBits    <- bits(sample)
 snd      <- sound(sample)
 
+# Get a new sample that is a portion of the given one
 getPortion <- function(sample, sFreq, start, duration) {
    startSample <- start * sFreq
    endSample   <- startSample + duration * sFreq - 1
    return(sample[startSample:endSample])
 }
 
+#Some helper functions to help me find the portion I'm looking for
 #findStart
 fs <- function(start,end) {
    return(getPortion(sample, sFreq, start, end))
 }
-
 
 #playFrom
 pf <- function(start,end){
    play(fs(start,end))
 }
 
+#Now I've found the portion I want, so time to get to work
 sampleFrag = fs(38.4, 15.9)
-plot(timeArray, s1, type='l', col='black', xlab='Time (ms)', ylab='Amplitude')
+sampleFragSound = sound(sampleFrag)
+
+plotTimeDomain <- function(sample) {
+   f     <- rate(sample)
+   snd   <- sound(sample)
+   s1    <- snd[1,]
+   timeArray <- (0:(length(s1)-1))
+   plot(timeArray, s1, type='l', col='black', xlab='Time (ms)', ylab='Amplitude')
+}
+
+plotFrequencyDomain <- function(sample) {
+   snd   <- sound(sample)
+   s1    <- snd[1,]
+   n     <- length(s1)
+   p     <- fft(s1)
+   nUniquePts <- ceiling((n+1)/2)
+   p <- p[1:nUniquePts]
+   p <- abs(p)
+   p <- p/n
+   p <- p^2
+
+   if (n %% 2 > 0){
+      p[2:length(p)] <- p[2:length(p)]*2 # we've got odd number of points fft
+   } else {
+      p[2: (length(p) -1)] <- p[2: (length(p) -1)]*2 # we've got even number of points fft
+   }
+
+   freqArray <- (0:(nUniquePts-1)) * (sampFreq / n) #  create the frequency array 
+   plot(freqArray/1000, 10*log10(p), type='l', col='black', xlab='Frequency (kHz)', ylab='Power (dB)')
+}
+
+plotFreqDomain <- function(sample) {
+   plot(timeArray, s1, type='l', col='black', xlab='Time (ms)', ylab='Amplitude')
+}
 
 #source('lt.R')
