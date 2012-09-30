@@ -1,7 +1,8 @@
 library(sound)
+library(matlab)
 
 # Turkish March -- Mozart
-sample   <- loadSample('tm.wav')
+sample   <- loadSample('../data/tm.wav')
 sFreq    <- rate(sample)
 nBits    <- bits(sample)
 snd      <- sound(sample)
@@ -59,6 +60,21 @@ plotFrequencyDomain <- function(sample) {
 
 plotFreqDomain <- function(sample) {
    plot(timeArray, s1, type='l', col='black', xlab='Time (ms)', ylab='Amplitude')
+}
+
+sinusoid <- function(x, amplitude, phase, frequency) {
+   return(amplitude * sin( (2 * pi * frequency * x) + phase ))
+}
+
+psin <- function(x0, x1, amplitude, phase, frequency) {
+   #Nyquist says to use this many samples...
+   n <- (2*frequency) * (x1 - x0);
+   #But, Nyquist was reconstructing analog signals, not connecting dots with straight lines.
+   n <- 50*n;
+
+   x <- linspace(x1,x0,n);
+
+   plot(x,sinusoid(x,amplitude,phase,frequency), type='l', col='red');
 }
 
 #source('lt.R')
