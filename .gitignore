@@ -1,6 +1,7 @@
 .RData
 .Rhistory
 .*.swp
+.*.swo
 lt.Rout
 tm.mp3
 tm.wav

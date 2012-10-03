@@ -1,5 +1,6 @@
 library(sound)
 library(matlab)
+library(plyr)
 
 # Turkish March -- Mozart
 sample   <- loadSample('../data/tm.wav')
@@ -63,18 +64,39 @@ plotFreqDomain <- function(sample) {
 }
 
 sinusoid <- function(x, amplitude, phase, frequency) {
-   return(amplitude * sin( (2 * pi * frequency * x) + phase ))
+   return(amplitude * sin( (2 * pi * frequency * x) + (phase * pi / 180)))
 }
 
-psin <- function(x0, x1, amplitude, phase, frequency) {
+sinusoids <- function(x0, x1, sinusoids){
+   #x = getSamplePoints(x0, x1, max(sinusoids$frequency));
+   x = getSamplePoints(x0, x1, max(sinusoids[,3]));
+   y = vector(length=length(x), mode="numeric")
+   #for(i in seq(sinusoids)){
+   for(i in seq(sinusoids[,1])){
+      #fucking data frames. The titles are included in the indexes returned from seq
+      #y <- y + sinusoid(x, sinusoids[i,]$amplitude, sinusoids[i,]$phase, sinusoids[i,]$frequency);
+      y <- y + sinusoid(x, sinusoids[i,1], sinusoids[i,2], sinusoids[i,3]);
+   }
+   return(list(x=x,y=y))
+}
+
+getSamplePoints <- function(x0, x1, frequency){
    #Nyquist says to use this many samples...
    n <- (2*frequency) * (x1 - x0);
    #But, Nyquist was reconstructing analog signals, not connecting dots with straight lines.
    n <- 50*n;
+   return(linspace(x0,x1,n));
+}
 
-   x <- linspace(x1,x0,n);
-
+psin <- function(x0, x1, amplitude, phase, frequency) {
+   x <- getSamplePoints(x0, x1, frequency);
    plot(x,sinusoid(x,amplitude,phase,frequency), type='l', col='red');
+}
+
+makeSinusoids <- function(amplitudes, phases, frequencies){
+   #To hell with data frames
+   #return(data.frame(amplitude=amplitudes, phase=phases, frequency=frequencies));
+   return(matrix(append(amplitudes, append(phases, frequencies)), ncol=3));
 }
 
 #source('lt.R')
