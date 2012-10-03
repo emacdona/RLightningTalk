@@ -68,13 +68,9 @@ sinusoid <- function(x, amplitude, phase, frequency) {
 }
 
 sinusoids <- function(x0, x1, sinusoids){
-   #x = getSamplePoints(x0, x1, max(sinusoids$frequency));
    x = getSamplePoints(x0, x1, max(sinusoids[,3]));
    y = vector(length=length(x), mode="numeric")
-   #for(i in seq(sinusoids)){
    for(i in seq(sinusoids[,1])){
-      #fucking data frames. The titles are included in the indexes returned from seq
-      #y <- y + sinusoid(x, sinusoids[i,]$amplitude, sinusoids[i,]$phase, sinusoids[i,]$frequency);
       y <- y + sinusoid(x, sinusoids[i,1], sinusoids[i,2], sinusoids[i,3]);
    }
    return(list(x=x,y=y))
@@ -94,8 +90,6 @@ psin <- function(x0, x1, amplitude, phase, frequency) {
 }
 
 makeSinusoids <- function(amplitudes, phases, frequencies){
-   #To hell with data frames
-   #return(data.frame(amplitude=amplitudes, phase=phases, frequency=frequencies));
    return(matrix(append(amplitudes, append(phases, frequencies)), ncol=3));
 }
 
