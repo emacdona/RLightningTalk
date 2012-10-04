@@ -93,4 +93,40 @@ makeSinusoids <- function(amplitudes, phases, frequencies){
    return(matrix(append(amplitudes, append(phases, frequencies)), ncol=3));
 }
 
+fourierSeries <- function(a,b,n){
+   sinusoids <- matrix(nrow = 2*(n+1), ncol = 3);
+   for(i in 0:n){
+      sinusoids[2*i+1,1] <- a(i);
+      sinusoids[2*i+1,2] <- 90;
+      sinusoids[2*i+1,3] <- i;
+
+      sinusoids[2*i+2,1] <- b(i);
+      sinusoids[2*i+2,2] <- 0;
+      sinusoids[2*i+2,3] <- i;
+   }
+   return(sinusoids);
+}
+
+triangleAn <- function(n) {
+   return(0);
+}
+
+triangleBn <- function(n) {
+   if(n == 0){
+      return(0);
+   }
+   return((8/((n^2)*(pi^2)))*sin(n*pi/2));
+}
+
+squareAn <- function(n){
+   if(n == 0){
+      return(0);
+   }
+   return((2/(n*pi))*sin((n*pi)/2));
+}
+
+squareBn <- function(n){
+   return(0);
+}
+
 #source('lt.R')
