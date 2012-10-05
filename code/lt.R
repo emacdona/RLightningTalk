@@ -93,40 +93,83 @@ makeSinusoids <- function(amplitudes, phases, frequencies){
    return(matrix(append(amplitudes, append(phases, frequencies)), ncol=3));
 }
 
-fourierSeries <- function(a,b,n){
+fourierSeries <- function(a,b,T0,n){
    sinusoids <- matrix(nrow = 2*(n+1), ncol = 3);
    for(i in 0:n){
       sinusoids[2*i+1,1] <- a(i);
       sinusoids[2*i+1,2] <- 90;
-      sinusoids[2*i+1,3] <- i;
+      sinusoids[2*i+1,3] <- i/T0;
 
       sinusoids[2*i+2,1] <- b(i);
       sinusoids[2*i+2,2] <- 0;
-      sinusoids[2*i+2,3] <- i;
+      sinusoids[2*i+2,3] <- i/T0;
    }
    return(sinusoids);
 }
 
-triangleAn <- function(n) {
-   return(0);
+plotFS <- function(x0, x1, dbIndex, n){
+   ss <- sinusoids(
+            x0, x1,
+            fourierSeries(
+               coefficients[[dbIndex]][["an"]],
+               coefficients[[dbIndex]][["bn"]],
+               coefficients[[dbIndex]][["T0"]],
+               n
+            ));
+   plot( ss[['x']], 
+         ss[['y']], 
+         type='l', col="blue");
+   lines( ss[['x']], 
+         sapply(
+            ss[['x']],
+            coefficients[[dbIndex]][["trueFn"]]
+         ),
+         type='l', col="red");
 }
 
-triangleBn <- function(n) {
-   if(n == 0){
-      return(0);
-   }
-   return((8/((n^2)*(pi^2)))*sin(n*pi/2));
-}
-
-squareAn <- function(n){
-   if(n == 0){
-      return(0);
-   }
-   return((2/(n*pi))*sin((n*pi)/2));
-}
-
-squareBn <- function(n){
-   return(0);
-}
+#Database of interesting coefficients
+coefficients <- list(
+   triangleWave = list(
+      an = function(n){
+         return(0);
+      },
+      bn = function(n){
+         if(n == 0){
+            return(0);
+         }
+         return((8/((n^2)*(pi^2)))*sin(n*pi/2));
+      },
+      T0 = 2,
+      trueFn = function(x){
+         x <- x + 0.5;
+         x <- x %% 2;
+         if( ( floor(x) %% 2 ) == 0 ){
+            return( 2*x - 1 );
+          }
+         return( -2*(x-1) + 1 );
+      }
+   ),
+   squareWave = list(
+      an = function(n){
+         if(n == 0){
+            return(1/2);
+         }
+         return((2/(n*pi))*sin((n*pi)/2));
+      },
+      bn = function(n){
+         return(0);
+      },
+      T0 = 2*pi,
+      trueFn = function(x){
+         x0 <- abs(x) %% (2*pi);
+         if( (x0 < pi/2) || (x0 > 3*pi/2) ){
+            return(1);
+         }
+         else{
+            return(0);
+         }
+      }
+   )
+);
 
 #source('lt.R')
