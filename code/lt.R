@@ -172,4 +172,9 @@ coefficients <- list(
    )
 );
 
+#TODO:
+#Add labels to the plot datbase.
+#Add a callback to add arbitrary plot decorations
+#Add a callback to get arbitrary plot configurations (axis height and width, for example)
+
 #source('lt.R')
