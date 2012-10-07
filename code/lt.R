@@ -121,7 +121,11 @@ triangleWave = list(
          return( 2*x - 1 );
        }
       return( -2*(x-1) + 1 );
-   }
+   },
+   plotParams = list(
+      xlab=expression(x),
+      ylab=expression(y)
+   )
 );
 class(triangleWave) <- c("FourierSeriesApproximation");
 
@@ -144,20 +148,24 @@ squareWave = list(
       else{
          return(0);
       }
-   }
+   },
+   plotParams = list(
+      xlab=expression(x),
+      ylab=expression(y)
+   )
 );
 class(squareWave) <- c("FourierSeriesApproximation");
 
-#sinusoid(amplitude, phase, frequency){
-#   s <- list(  amplitude=amplitude, 
-#               phase=phase, 
-#               frequency=frequency
-#               f=function(x){
-#                  return (amplitude * sin( (2 * pi * frequency * x) + (phase * pi / 180)))
-#               });
-#   class(s) <- c("sinusoid");
-#   return s;
-#}
+Sinusoid <- function(amplitude, phase, frequency){
+   s <- list(  amplitude=amplitude, 
+               phase=phase, 
+               frequency=frequency,
+               f=function(x){
+                  return (amplitude * sin( (2 * pi * frequency * x) + (phase * pi / 180)))
+               });
+   class(s) <- c("Sinusoid");
+   return(s);
+}
 
 print.FourierSeriesApproximation <- function(fsa){
    cat("T0: ", fsa$T0, "\n\n");
@@ -176,10 +184,16 @@ plot.FourierSeriesApproximation <- function(fsa,x0,x1,n){
    ss <- sinusoids(
             x0, x1,
             fourierSeries(fsa$an, fsa$bn, fsa$T0, n));
-   plot( ss$x, ss$y, type='l', col="blue");
+   plot( ss$x, ss$y, type='l', col="blue", xlab=fsa$plotParams$xlab, ylab=fsa$plotParams$ylab);
    lines( ss$x, 
          sapply( ss$x, fsa$trueFn),
          type='l', col="red");
+   legend(  "topright", 
+            legend=sapply(
+               c(bquote(F[.(n)](x)), bquote(f(x))),
+               as.expression
+            ), 
+            fill=c("blue", "red"));
 }
 
 #TODO:
