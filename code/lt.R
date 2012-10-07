@@ -89,10 +89,6 @@ psin <- function(x0, x1, amplitude, phase, frequency) {
    plot(x,sinusoid(x,amplitude,phase,frequency), type='l', col='red');
 }
 
-makeSinusoids <- function(amplitudes, phases, frequencies){
-   return(matrix(append(amplitudes, append(phases, frequencies)), ncol=3));
-}
-
 fourierSeries <- function(a,b,T0,n){
    sinusoids <- matrix(nrow = 2*(n+1), ncol = 3);
    for(i in 0:n){
@@ -107,70 +103,84 @@ fourierSeries <- function(a,b,T0,n){
    return(sinusoids);
 }
 
-plotFS <- function(x0, x1, dbIndex, n){
-   ss <- sinusoids(
-            x0, x1,
-            fourierSeries(
-               coefficients[[dbIndex]][["an"]],
-               coefficients[[dbIndex]][["bn"]],
-               coefficients[[dbIndex]][["T0"]],
-               n
-            ));
-   plot( ss[['x']], 
-         ss[['y']], 
-         type='l', col="blue");
-   lines( ss[['x']], 
-         sapply(
-            ss[['x']],
-            coefficients[[dbIndex]][["trueFn"]]
-         ),
-         type='l', col="red");
+triangleWave = list(
+   an = function(n){
+      return(0);
+   },
+   bn = function(n){
+      if(n == 0){
+         return(0);
+      }
+      return((8/((n^2)*(pi^2)))*sin(n*pi/2));
+   },
+   T0 = 2,
+   trueFn = function(x){
+      x <- x + 0.5;
+      x <- x %% 2;
+      if( ( floor(x) %% 2 ) == 0 ){
+         return( 2*x - 1 );
+       }
+      return( -2*(x-1) + 1 );
+   }
+);
+class(triangleWave) <- c("FourierSeriesApproximation");
+
+squareWave = list(
+   an = function(n){
+      if(n == 0){
+         return(1/2);
+      }
+      return((2/(n*pi))*sin((n*pi)/2));
+   },
+   bn = function(n){
+      return(0);
+   },
+   T0 = 2*pi,
+   trueFn = function(x){
+      x0 <- abs(x) %% (2*pi);
+      if( (x0 < pi/2) || (x0 > 3*pi/2) ){
+         return(1);
+      }
+      else{
+         return(0);
+      }
+   }
+);
+class(squareWave) <- c("FourierSeriesApproximation");
+
+#sinusoid(amplitude, phase, frequency){
+#   s <- list(  amplitude=amplitude, 
+#               phase=phase, 
+#               frequency=frequency
+#               f=function(x){
+#                  return (amplitude * sin( (2 * pi * frequency * x) + (phase * pi / 180)))
+#               });
+#   class(s) <- c("sinusoid");
+#   return s;
+#}
+
+print.FourierSeriesApproximation <- function(fsa){
+   cat("T0: ", fsa$T0, "\n\n");
+   cat("an:", "\n"); 
+   print(fsa$an);
+   cat("\nbn:", "\n");
+   print(fsa$bn);
+   cat("\ntrueFn:", "\n");
+   print(fsa$trueFn);
 }
 
-#Database of interesting coefficients
-coefficients <- list(
-   triangleWave = list(
-      an = function(n){
-         return(0);
-      },
-      bn = function(n){
-         if(n == 0){
-            return(0);
-         }
-         return((8/((n^2)*(pi^2)))*sin(n*pi/2));
-      },
-      T0 = 2,
-      trueFn = function(x){
-         x <- x + 0.5;
-         x <- x %% 2;
-         if( ( floor(x) %% 2 ) == 0 ){
-            return( 2*x - 1 );
-          }
-         return( -2*(x-1) + 1 );
-      }
-   ),
-   squareWave = list(
-      an = function(n){
-         if(n == 0){
-            return(1/2);
-         }
-         return((2/(n*pi))*sin((n*pi)/2));
-      },
-      bn = function(n){
-         return(0);
-      },
-      T0 = 2*pi,
-      trueFn = function(x){
-         x0 <- abs(x) %% (2*pi);
-         if( (x0 < pi/2) || (x0 > 3*pi/2) ){
-            return(1);
-         }
-         else{
-            return(0);
-         }
-      }
-   )
-);
+sinusoids.FourierSeriesApproximation <- function(fsa){
+}
+
+plot.FourierSeriesApproximation <- function(fsa,x0,x1,n){
+   ss <- sinusoids(
+            x0, x1,
+            fourierSeries(fsa$an, fsa$bn, fsa$T0, n));
+   plot( ss$x, ss$y, type='l', col="blue");
+   lines( ss$x, 
+         sapply( ss$x, fsa$trueFn),
+         type='l', col="red");
+}
 
 #TODO:
 #Add labels to the plot datbase.
