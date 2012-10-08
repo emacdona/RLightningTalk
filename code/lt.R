@@ -193,7 +193,9 @@ plot.FourierSeriesApproximation <- function(fsa,x0,x1,n){
                c(bquote(F[.(n)](x)), bquote(f(x))),
                as.expression
             ), 
-            fill=c("blue", "red"));
+            fill=c("blue", "red"),
+            y.intersp=1.5,
+            bg="white");
 }
 
 #TODO:
