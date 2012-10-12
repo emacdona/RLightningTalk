@@ -1,13 +1,8 @@
 library(matlab)
 
-getSamplePoints <- function(x0, x1, frequency){
-   #Nyquist says to use this many samples...
-   n <- (2*frequency) * (x1 - x0);
-   #But, Nyquist was reconstructing analog signals, not connecting dots with straight lines.
-   n <- 50*n;
-   return(linspace(x0,x1,n));
-}
-
+#----------------------------------------------------------------------
+# Create some instances of the FSApprox class
+#----------------------------------------------------------------------
 triangleWave = list(
    T0 = 2,
    an = function(n){
@@ -28,7 +23,7 @@ triangleWave = list(
       return( -2*(x-1) + 1 );
    }
 );
-class(triangleWave) <- c("FSApprox", "FSApproxPlot");
+class(triangleWave) <- c("FSApprox");
 
 squareWave = list(
    T0 = 2*pi,
@@ -51,18 +46,25 @@ squareWave = list(
       }
    }
 );
-class(squareWave) <- c("FSApprox", "FSApproxPlot");
+class(squareWave) <- c("FSApprox");
+
+#----------------------------------------------------------------------
+# Virutal function declarations for FSApprox class
+#----------------------------------------------------------------------
+Fn <- function(x, ...){
+   UseMethod("Fn");
+}
 
 getPlotParams <- function(x, ...){
    UseMethod("getPlotParams");
 }
 
-getPlotParams.FSApprox <- function(fsa){
-   return(list(
-      xlab=expression(x),
-      ylab=expression(y)
-   ));
-}
+#----------------------------------------------------------------------
+# FSApprox methods
+#
+# FSApprox is a class for representing Fourier Series Approximations
+# of functions
+#----------------------------------------------------------------------
 
 print.FSApprox <- function(fsa){
    cat("T0: ", fsa$T0, "\n\n");
@@ -93,9 +95,11 @@ plot.FSApprox <- function(fsa,x0,x1,n){
             bg="white");
 }
 
-#Boilerplate for: "Fn is a virutal function. I hope Object <x> provides a definition."
-Fn <- function(x, ...){
-   UseMethod("Fn");
+getPlotParams.FSApprox <- function(fsa){
+   return(list(
+      xlab=expression(x),
+      ylab=expression(y)
+   ));
 }
 
 Fn.FSApprox <- function(fsa,N){
@@ -116,6 +120,32 @@ Fn.FSApprox <- function(fsa,N){
   );
 }
 
+#-------------------
+#
+# Helper functions
+#
+#-------------------
+
+#---------------------------------------------------------------------------------------
+# getSamplePoints
+#
+# For a given starting point (x0), a given end point (x1), and a given frequency, return 
+# a vector starting at x0 and ending at x1 that has enough sample points to plot a 
+# signal with the given frequency
+#---------------------------------------------------------------------------------------
+getSamplePoints <- function(x0, x1, frequency){
+   #Nyquist says to use this many samples...
+   n <- (2*frequency) * (x1 - x0);
+   #But, Nyquist was reconstructing analog signals, not connecting dots with straight lines.
+   n <- 50*n;
+   return(linspace(x0,x1,n));
+}
+
+#---------------------------------------------------------------------------------------
+# summation 
+#
+# Returns: f(n) + f(n+1) + ... + f(N-1) + f(N)
+#---------------------------------------------------------------------------------------
 summation <- function(f, n, N){
    sum <- 0;
    for(i in n:N){
