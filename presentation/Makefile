@@ -1,4 +1,5 @@
-presentation.pdf: presentation.tex
+presentation.pdf: presentation.tex ../code/lt.R
+	R CMD BATCH ../code/lt.R
 	pdflatex presentation.tex
 
 clean:

@@ -154,4 +154,16 @@ summation <- function(f, n, N){
    return(sum);
 }
 
+pdf("squareWave10.pdf")
+plot(squareWave,-2*pi,2*pi,10);
+
+pdf("squareWave50.pdf")
+plot(squareWave,-2*pi,2*pi,50);
+
+pdf("triangleWave3.pdf")
+plot(triangleWave, -pi/2, pi/2, 3);
+
+pdf("triangleWave20.pdf")
+plot(triangleWave, -pi/2, pi/2, 20);
+
 #source('lt.R')
