@@ -1,38 +1,11 @@
 library(matlab)
 
-sinusoid <- function(x, amplitude, phase, frequency) {
-   return(amplitude * sin( (2 * pi * frequency * x) + (phase * pi / 180)))
-}
-
-sinusoids <- function(x0, x1, sinusoids){
-   x = getSamplePoints(x0, x1, max(sinusoids[,3]));
-   y = vector(length=length(x), mode="numeric")
-   for(i in seq(sinusoids[,1])){
-      y <- y + sinusoid(x, sinusoids[i,1], sinusoids[i,2], sinusoids[i,3]);
-   }
-   return(list(x=x,y=y))
-}
-
 getSamplePoints <- function(x0, x1, frequency){
    #Nyquist says to use this many samples...
    n <- (2*frequency) * (x1 - x0);
    #But, Nyquist was reconstructing analog signals, not connecting dots with straight lines.
    n <- 50*n;
    return(linspace(x0,x1,n));
-}
-
-fourierSeries <- function(a,b,T0,n){
-   sinusoids <- matrix(nrow = 2*(n+1), ncol = 3);
-   for(i in 0:n){
-      sinusoids[2*i+1,1] <- a(i);
-      sinusoids[2*i+1,2] <- 90;
-      sinusoids[2*i+1,3] <- i/T0;
-
-      sinusoids[2*i+2,1] <- b(i);
-      sinusoids[2*i+2,2] <- 0;
-      sinusoids[2*i+2,3] <- i/T0;
-   }
-   return(sinusoids);
 }
 
 triangleWave = list(
@@ -80,17 +53,6 @@ squareWave = list(
 );
 class(squareWave) <- c("FSApprox", "FSApproxPlot");
 
-Sinusoid <- function(amplitude, phase, frequency){
-   s <- list(  amplitude=amplitude, 
-               phase=phase, 
-               frequency=frequency,
-               f=function(x){
-                  return (amplitude * sin( (2 * pi * frequency * x) + (phase * pi / 180)))
-               });
-   class(s) <- c("Sinusoid");
-   return(s);
-}
-
 getPlotParams <- function(x, ...){
    UseMethod("getPlotParams");
 }
@@ -112,13 +74,7 @@ print.FSApprox <- function(fsa){
    print(fsa$trueFn);
 }
 
-sinusoids.FSApprox <- function(fsa){
-}
-
 plot.FSApprox <- function(fsa,x0,x1,n){
-#   ss <- sinusoids(
-#            x0, x1,
-#            fourierSeries(fsa$an, fsa$bn, fsa$T0, n));
    x <- getSamplePoints(x0,x1,n/fsa$T0) ;
    plot( x, Fn(fsa,n)(x), 
          type='l', col="blue", 
@@ -160,21 +116,12 @@ Fn.FSApprox <- function(fsa,N){
   );
 }
 
-#summation <- function(f, n, N){
-#   sum <- 0;
-#   for(i in n:N){
-#      sum <- sum + f(i);
-#   }
-#   return(sum);
-#}
-
-summation <- function(f, n, N, sumAccumulator=0){
-   if(n == (N+1)){
-      return(sumAccumulator);
+summation <- function(f, n, N){
+   sum <- 0;
+   for(i in n:N){
+      sum <- sum + f(i);
    }
-   else{
-      summation(f, n+1, N, sumAccumulator + f(n));
-   }
+   return(sum);
 }
 
 #source('lt.R')
