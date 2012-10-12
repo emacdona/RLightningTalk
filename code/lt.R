@@ -36,6 +36,7 @@ fourierSeries <- function(a,b,T0,n){
 }
 
 triangleWave = list(
+   T0 = 2,
    an = function(n){
       return(0);
    },
@@ -45,7 +46,6 @@ triangleWave = list(
       }
       return((8/((n^2)*(pi^2)))*sin(n*pi/2));
    },
-   T0 = 2,
    trueFn = function(x){
       x <- x + 0.5;
       x <- x %% 2;
@@ -58,6 +58,7 @@ triangleWave = list(
 class(triangleWave) <- c("FSApprox", "FSApproxPlot");
 
 squareWave = list(
+   T0 = 2*pi,
    an = function(n){
       if(n == 0){
          return(1/2);
@@ -67,7 +68,6 @@ squareWave = list(
    bn = function(n){
       return(0);
    },
-   T0 = 2*pi,
    trueFn = function(x){
       x0 <- abs(x) %% (2*pi);
       if( (x0 < pi/2) || (x0 > 3*pi/2) ){
@@ -116,15 +116,16 @@ sinusoids.FSApprox <- function(fsa){
 }
 
 plot.FSApprox <- function(fsa,x0,x1,n){
-   ss <- sinusoids(
-            x0, x1,
-            fourierSeries(fsa$an, fsa$bn, fsa$T0, n));
-   plot( ss$x, sapply(ss$x, Fn(fsa,n)), 
+#   ss <- sinusoids(
+#            x0, x1,
+#            fourierSeries(fsa$an, fsa$bn, fsa$T0, n));
+   x <- getSamplePoints(x0,x1,n/fsa$T0) ;
+   plot( x, Fn(fsa,n)(x), 
          type='l', col="blue", 
          xlab=getPlotParams(fsa)$xlab, 
          ylab=getPlotParams(fsa)$ylab);
-   lines( ss$x, 
-         sapply( ss$x, fsa$trueFn),
+   lines( x, 
+         sapply( x, fsa$trueFn),
          type='l', col="red");
    legend(  "topright", 
             legend=sapply(
@@ -158,6 +159,14 @@ Fn.FSApprox <- function(fsa,N){
       }
   );
 }
+
+#summation <- function(f, n, N){
+#   sum <- 0;
+#   for(i in n:N){
+#      sum <- sum + f(i);
+#   }
+#   return(sum);
+#}
 
 summation <- function(f, n, N, sumAccumulator=0){
    if(n == (N+1)){
