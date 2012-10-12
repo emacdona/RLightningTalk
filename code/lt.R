@@ -119,7 +119,7 @@ plot.FSApprox <- function(fsa,x0,x1,n){
    ss <- sinusoids(
             x0, x1,
             fourierSeries(fsa$an, fsa$bn, fsa$T0, n));
-   plot( ss$x, ss$y, 
+   plot( ss$x, sapply(ss$x, Fn(fsa,n)), 
          type='l', col="blue", 
          xlab=getPlotParams(fsa)$xlab, 
          ylab=getPlotParams(fsa)$ylab);
@@ -136,8 +136,35 @@ plot.FSApprox <- function(fsa,x0,x1,n){
             bg="white");
 }
 
-Fn.FSApprox <- function(fsa,x){
-   function(x){
+#Boilerplate for: "Fn is a virutal function. I hope Object <x> provides a definition."
+Fn <- function(x, ...){
+   UseMethod("Fn");
+}
+
+Fn.FSApprox <- function(fsa,N){
+   return(
+      function(x){
+         return(
+            summation(
+               function(n) {
+                  return(
+                     (fsa$an(n) * sin( (2 * pi * n/fsa$T0 * x) + (90 * pi / 180))) +
+                     (fsa$bn(n) * sin(  2 * pi * n/fsa$T0 * x  )) 
+                  );
+               }, 
+               0,N
+            )
+         );
+      }
+  );
+}
+
+summation <- function(f, n, N, sumAccumulator=0){
+   if(n == (N+1)){
+      return(sumAccumulator);
+   }
+   else{
+      summation(f, n+1, N, sumAccumulator + f(n));
    }
 }
 
