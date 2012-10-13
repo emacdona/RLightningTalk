@@ -1,5 +1,6 @@
 \documentclass{beamer}
 \usepackage{dsfont}
+\usepackage{listings}
 \usetheme{CambridgeUS}
 \mode<presentation>
 \title[Exploring R]{Exploring R via Fourier Series}
@@ -8,6 +9,16 @@
 \renewcommand\mathfamilydefault{\rmdefault}
 \usepackage{verbatim}
 \definecolor{demph-color}{gray}{0.80}
+\definecolor{listinggray}{gray}{0.90}
+
+
+\lstset{language=R} 
+\lstset{backgroundcolor=\color{listinggray}}
+\lstset{linewidth=90mm}
+\lstset{frame=single}
+\lstset{keywordstyle=\color{blue}}
+\lstset{basicstyle=\tiny}
+
 \begin{document}
 
 \begin{frame}
@@ -64,6 +75,184 @@
    \begin{figure}
    \includegraphics[scale=0.40]{triangleWave20.pdf}
    \end{figure}
+\end{frame}
+
+\begin{frame}[fragile]
+   \begin{center}
+   \begin{minipage}{100mm}
+   \begin{lstlisting}
+      triangleWave = list(
+         T0 = 2,
+         an = function(n){
+            return(0);
+         },
+         bn = function(n){
+            if(n == 0){
+               return(0);
+            }
+            return((8/((n^2)*(pi^2)))*sin(n*pi/2));
+         },
+         trueFn = function(x){
+            x <- x + 0.5;
+            x <- x %% 2;
+            if( ( floor(x) %% 2 ) == 0 ){
+               return( 2*x - 1 );
+            }
+            return( -2*(x-1) + 1 );
+         }
+      );
+      class(triangleWave) <- c("FSApprox");
+   \end{lstlisting}
+   \end{minipage}
+   \end{center}
+\end{frame}
+
+\begin{frame}[fragile]
+   \begin{center}
+   \begin{minipage}{100mm}
+   \begin{lstlisting}
+      squareWave = list(
+         T0 = 2*pi,
+         an = function(n){
+            if(n == 0){
+               return(1/2);
+            }
+            return((2/(n*pi))*sin((n*pi)/2));
+         },
+         bn = function(n){
+            return(0);
+         },
+         trueFn = function(x){
+            x0 <- abs(x) %% (2*pi);
+            if( (x0 < pi/2) || (x0 > 3*pi/2) ){
+               return(1);
+            }
+            else{
+               return(0);
+            }
+         }
+      );
+      class(squareWave) <- c("FSApprox");
+   \end{lstlisting}
+   \end{minipage}
+   \end{center}
+\end{frame}
+
+\begin{frame}[fragile]
+   \begin{center}
+   \begin{minipage}{100mm}
+   \begin{lstlisting}
+      getPlotParams <- function(x, ...){
+         UseMethod("getPlotParams");
+      }
+
+      Fn <- function(x, ...){
+         UseMethod("Fn");
+      }
+   \end{lstlisting}
+   \end{minipage}
+   \end{center}
+\end{frame}
+
+\begin{frame}[fragile]
+   \begin{center}
+   \begin{minipage}{100mm}
+   \begin{lstlisting}
+      getPlotParams.FSApprox <- function(fsa){
+         return(list(
+            xlab=expression(x),
+            ylab=expression(y)
+         ));
+      }
+
+      Fn.FSApprox <- function(fsa,N){
+         return(
+            function(x){
+               return(
+                  summation(
+                     function(n) {
+                        return(
+                           (fsa$an(n) * 
+                              sin( (2 * pi * n/fsa$T0 * x) + 
+                              (90 * pi / 180))) +
+                           (fsa$bn(n) * 
+                              sin(  2 * pi * n/fsa$T0 * x  )) 
+                        );
+                     }, 
+                     0,N
+                  )
+               );
+            }
+         );
+      }
+   \end{lstlisting}
+   \end{minipage}
+   \end{center}
+\end{frame}
+
+\begin{frame}[fragile]
+   \begin{center}
+   \begin{minipage}{100mm}
+   \begin{lstlisting}
+      getSamplePoints <- function(x0, x1, frequency){
+         #Nyquist says to use this many samples...
+         n <- (2*frequency) * (x1 - x0);
+         #But, Nyquist was reconstructing analog signals, not 
+         #connecting dots with straight lines.
+         n <- 50*n;
+         return(linspace(x0,x1,n));
+      }
+
+      summation <- function(f, n, N){
+         sum <- 0;
+         for(i in n:N){
+            sum <- sum + f(i);
+         }
+         return(sum);
+      }
+   \end{lstlisting}
+   \end{minipage}
+   \end{center}
+\end{frame}
+
+\begin{frame}[fragile]
+   \begin{center}
+   \begin{minipage}{100mm}
+   \begin{lstlisting}
+      plot.FSApprox <- function(fsa,x0,x1,n){
+         x <- getSamplePoints(x0,x1,n/fsa$T0) ;
+         plot( x, Fn(fsa,n)(x), 
+               type='l', col="blue", 
+               xlab=getPlotParams(fsa)$xlab, 
+               ylab=getPlotParams(fsa)$ylab);
+         lines( x, 
+               sapply( x, fsa$trueFn),
+               type='l', col="red");
+         legend(  "topright", 
+                  legend=sapply(
+                     c(bquote(F[.(n)](x)), bquote(f(x))),
+                     as.expression
+                  ), 
+                  fill=c("blue", "red"),
+                  y.intersp=1.5,
+                  bg="white");
+      }
+   \end{lstlisting}
+   \end{minipage}
+   \end{center}
+\end{frame}
+
+\begin{frame}[fragile]
+   \begin{center}
+   \begin{minipage}{100mm}
+   \begin{lstlisting}
+      plot(squareWave,-2*pi,2*pi,10);
+      plot(squareWave,-2*pi,2*pi,50);
+      plot(triangleWave, -pi/2, pi/2, 3);
+      plot(triangleWave, -pi/2, pi/2, 20);
+   \end{lstlisting}
+   \end{minipage}
+   \end{center}
 \end{frame}
 
 \begin{comment}

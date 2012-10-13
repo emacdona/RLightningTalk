@@ -81,7 +81,7 @@ plot.FSApprox <- function(fsa,x0,x1,n){
    plot( x, Fn(fsa,n)(x), 
          type='l', col="blue", 
          xlab=getPlotParams(fsa)$xlab, 
-         ylab=getPlotParams(fsa)$ylab);
+         ylab=getPlotParams(fsa)$ylab);#, axes="false");
    lines( x, 
          sapply( x, fsa$trueFn),
          type='l', col="red");
@@ -93,6 +93,10 @@ plot.FSApprox <- function(fsa,x0,x1,n){
             fill=c("blue", "red"),
             y.intersp=1.5,
             bg="white");
+#   axis(1,  at=c(-2*pi, -pi, pi, 2*pi),
+#            labels=c(expression(-2*pi, -pi, pi, 2*pi)));
+#   axis(2,  at=c(0,1),
+#            labels=c(0,1));
 }
 
 getPlotParams.FSApprox <- function(fsa){
