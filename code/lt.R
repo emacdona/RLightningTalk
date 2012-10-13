@@ -1,20 +1,34 @@
-library(matlab)
+library(matlab) # So we have linspace()
+
+#----------------------------------------------------------------------
+# FSApprox Constructor
+#----------------------------------------------------------------------
+makeFSApprox <- function(T0, an, bn, trueFn){
+   fsApprox <- list(
+      T0 = T0,
+      an = an,
+      bn = bn,
+      trueFn = trueFn
+   );
+   class(fsApprox) <- c("FSApprox");
+   return(fsApprox);
+}
 
 #----------------------------------------------------------------------
 # Create some instances of the FSApprox class
 #----------------------------------------------------------------------
-triangleWave = list(
-   T0 = 2,
-   an = function(n){
+triangleWave = makeFSApprox(
+   2,
+   function(n){
       return(0);
    },
-   bn = function(n){
+   function(n){
       if(n == 0){
          return(0);
       }
       return((8/((n^2)*(pi^2)))*sin(n*pi/2));
    },
-   trueFn = function(x){
+   function(x){
       x <- x + 0.5;
       x <- x %% 2;
       if( ( floor(x) %% 2 ) == 0 ){
@@ -23,20 +37,19 @@ triangleWave = list(
       return( -2*(x-1) + 1 );
    }
 );
-class(triangleWave) <- c("FSApprox");
 
-squareWave = list(
-   T0 = 2*pi,
-   an = function(n){
+squareWave = makeFSApprox(
+   2*pi,
+   function(n){
       if(n == 0){
          return(1/2);
       }
       return((2/(n*pi))*sin((n*pi)/2));
    },
-   bn = function(n){
+   function(n){
       return(0);
    },
-   trueFn = function(x){
+   function(x){
       x0 <- abs(x) %% (2*pi);
       if( (x0 < pi/2) || (x0 > 3*pi/2) ){
          return(1);
@@ -46,7 +59,6 @@ squareWave = list(
       }
    }
 );
-class(squareWave) <- c("FSApprox");
 
 #----------------------------------------------------------------------
 # Virutal function declarations for FSApprox class
@@ -81,28 +93,24 @@ plot.FSApprox <- function(fsa,x0,x1,n){
    plot( x, Fn(fsa,n)(x), 
          type='l', col="blue", 
          xlab=getPlotParams(fsa)$xlab, 
-         ylab=getPlotParams(fsa)$ylab);#, axes="false");
+         ylab=getPlotParams(fsa)$ylab);
    lines( x, 
          sapply( x, fsa$trueFn),
          type='l', col="red");
    legend(  "topright", 
             legend=sapply(
-               c(bquote(F[.(n)](x)), bquote(f(x))),
+               c(bquote(F[.(n)](t)), bquote(f(t))),
                as.expression
             ), 
             fill=c("blue", "red"),
             y.intersp=1.5,
             bg="white");
-#   axis(1,  at=c(-2*pi, -pi, pi, 2*pi),
-#            labels=c(expression(-2*pi, -pi, pi, 2*pi)));
-#   axis(2,  at=c(0,1),
-#            labels=c(0,1));
 }
 
 getPlotParams.FSApprox <- function(fsa){
    return(list(
-      xlab=expression(x),
-      ylab=expression(y)
+      xlab=expression(t),
+      ylab=""
    ));
 }
 
