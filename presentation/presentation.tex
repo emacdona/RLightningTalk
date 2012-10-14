@@ -11,6 +11,8 @@
 \definecolor{demph-color}{gray}{0.80}
 \definecolor{listinggray}{gray}{0.90}
 
+\setbeamertemplate{itemize items}[default]
+\setbeamertemplate{enumerate items}[default]
 
 \lstset{language=R} 
 \lstset{backgroundcolor=\color{listinggray}}
@@ -54,24 +56,71 @@
 \end{frame}
 
 \begin{frame}
+   \frametitle{Fourier Series Approximation}
+   \[
+      \textcolor{red}{F_{N}}(t) = a_{0} + \sum_{n=1}^{\textcolor{red}{N}}
+         a_{n} \cos n \omega_{0} t + 
+         b_{n} \sin n \omega_{0} t
+   \]
+\end{frame}
+
+\begin{frame}
+   \frametitle{(Some) R Data Types}
+   \begin{columns}
+      \begin{column}{5cm}
+         \begin{itemize}
+            \item \alert<1>{Vectors}
+            \item \alert<2>{Lists}
+            \item \alert<3>{S3 Objects}
+         \end{itemize}
+      \end{column}
+      \begin{column}{5cm}
+         \only<1>{
+            \begin{block}{}
+               \begin{itemize}
+                  \item Fundamental R data type
+                  \item Scalars are represented as single element Vectors
+                  \item Constructed with: c()
+               \end{itemize}
+            \end{block}
+         }
+         \only<2>{
+            \begin{block}{}
+               Lists are associative arrays. Like Hashes in Perl or Dictionaries in Python.
+            \end{block}
+         }
+         \only<3>{
+            \begin{block}{}
+               S3 Objects are the old fashioned, type-unsafe way of doing objects. They are built on lists much like Perl objects are built on Hashes.
+            \end{block}
+         }
+      \end{column}
+   \end{columns}
+\end{frame}
+
+\begin{frame}
+   \frametitle{Approximation of Square Wave (10 Harmonics)}
    \begin{figure}
    \includegraphics[scale=0.40]{squareWave10.pdf}
    \end{figure}
 \end{frame}
 
 \begin{frame}
+   \frametitle{Approximation of Square Wave (50 Harmonics)}
    \begin{figure}
    \includegraphics[scale=0.40]{squareWave50.pdf}
    \end{figure}
 \end{frame}
 
 \begin{frame}
+   \frametitle{Approximation of Triangle Wave (3 Harmonics)}
    \begin{figure}
    \includegraphics[scale=0.40]{triangleWave3.pdf}
    \end{figure}
 \end{frame}
 
 \begin{frame}
+   \frametitle{Approximation of Triangle Wave (20 Harmonics)}
    \begin{figure}
    \includegraphics[scale=0.40]{triangleWave20.pdf}
    \end{figure}

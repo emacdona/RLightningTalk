@@ -99,7 +99,7 @@ plot.FSApprox <- function(fsa,x0,x1,n){
          type='l', col="red");
    legend(  "topright", 
             legend=sapply(
-               c(bquote(F[.(n)](t)), bquote(f(t))),
+               c(bquote(F[.(n)](t)), bquote(x(t))),
                as.expression
             ), 
             fill=c("blue", "red"),
