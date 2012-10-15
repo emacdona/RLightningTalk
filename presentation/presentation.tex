@@ -1,6 +1,7 @@
 \documentclass{beamer}
 \usepackage{dsfont}
 \usepackage{listings}
+\usepackage{caption}
 \usetheme{CambridgeUS}
 \mode<presentation>
 \title[Exploring R]{Exploring R via Fourier Series}
@@ -11,8 +12,13 @@
 \definecolor{demph-color}{gray}{0.80}
 \definecolor{listinggray}{gray}{0.90}
 
+\setlength{\abovecaptionskip}{-2ex}
+\setlength{\belowcaptionskip}{-2ex}
+
 \setbeamertemplate{itemize items}[default]
 \setbeamertemplate{enumerate items}[default]
+
+\captionsetup{font=scriptsize,labelformat=empty}
 
 \lstset{language=R} 
 \lstset{backgroundcolor=\color{listinggray}}
@@ -20,11 +26,22 @@
 \lstset{frame=single}
 \lstset{keywordstyle=\color{blue}}
 \lstset{basicstyle=\tiny}
+\lstdefinestyle{WithHighlights}{
+   language={R}, 
+   moredelim=**[is][\color{red}]{@}{@}
+}
 
 \begin{document}
 
 \begin{frame}
    \titlepage
+\end{frame}
+
+\begin{frame}
+   \frametitle{Fourier Series}
+   \begin{block}{}
+      Any periodic signal can be represented by an infinite sum of sinusoids.
+   \end{block}
 \end{frame}
 
 \begin{frame}
@@ -91,7 +108,7 @@
          }
          \only<3>{
             \begin{block}{}
-               S3 Objects are the old fashioned, type-unsafe way of doing objects. They are built on lists much like Perl objects are built on Hashes.
+               S3 Objects are the old fashioned, type-unsafe way of doing OO in R. They are built on Lists much like Perl objects are built on Hashes.
             \end{block}
          }
       \end{column}
@@ -100,14 +117,19 @@
 
 \begin{frame}[fragile]
    \frametitle{So let's model a Fourier Series Approximation in R...}
+   \[
+      F_{N}(t) = \textcolor{red}{a_{0}} + \sum_{n=1}^{N}
+      \textcolor{red}{a_{n}} \cos n \textcolor{red}{\omega_{0}} t + 
+      \textcolor{red}{b_{n}} \sin n \textcolor{red}{\omega_{0}} t
+   \]
    \begin{center}
    \begin{minipage}{100mm}
-   \begin{lstlisting}
+   \begin{lstlisting}[style=WithHighlights]
 makeFSApprox <- function(T0, an, bn, trueFn){
    fsApprox <- list(
-      T0 = T0,
-      an = an,
-      bn = bn,
+      @T0@ = T0,
+      @an@ = an,
+      @bn@ = bn,
       trueFn = trueFn
    );
    class(fsApprox) <- c("FSApprox");
@@ -310,7 +332,8 @@ plot(triangleWave, -pi/2, pi/2, 20);
 \begin{frame}[fragile]
    \frametitle{Approximation of Square Wave (50 Harmonics)}
    \begin{figure}
-   \includegraphics[scale=0.40]{squareWave50.pdf}
+      \caption{Note: Ask me about the Gibbs phenomenon and uniform vs. pointwise convergence! (I'll answer if there's time.)}
+      \includegraphics[scale=0.40]{squareWave50.pdf}
    \end{figure}
 \end{frame}
 
@@ -328,7 +351,32 @@ plot(triangleWave, -pi/2, pi/2, 20);
    \end{figure}
 \end{frame}
 
-\begin{frame}[fragile]
+\begin{frame}
    \frametitle{Questions?}
+\end{frame}
+
+\begin{frame}
+   \frametitle{Gibbs Phenomenon}
+   \begin{block}{}
+   The overshoot seen at the discontinuity in our square wave will never die out.
+   \end{block}
+\end{frame}
+\begin{frame}
+   \frametitle{Pointwise Convergence}
+   \begin{block}{}
+      Under Construction
+   \[
+      \forall
+   \]
+   \end{block}
+\end{frame}
+\begin{frame}
+   \frametitle{Uniform Convergence}
+   \begin{block}{}
+      Under Construction
+   \[
+      \forall
+   \]
+   \end{block}
 \end{frame}
 \end{document}
