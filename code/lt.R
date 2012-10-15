@@ -28,13 +28,13 @@ triangleWave = makeFSApprox(
       }
       return((8/((n^2)*(pi^2)))*sin(n*pi/2));
    },
-   function(x){
-      x <- x + 0.5;
-      x <- x %% 2;
-      if( ( floor(x) %% 2 ) == 0 ){
-         return( 2*x - 1 );
+   function(t){
+      t <- t + 0.5;
+      t <- t %% 2;
+      if( ( floor(t) %% 2 ) == 0 ){
+         return( 2*t - 1 );
        }
-      return( -2*(x-1) + 1 );
+      return( -2*(t-1) + 1 );
    }
 );
 
@@ -49,9 +49,9 @@ squareWave = makeFSApprox(
    function(n){
       return(0);
    },
-   function(x){
-      x0 <- abs(x) %% (2*pi);
-      if( (x0 < pi/2) || (x0 > 3*pi/2) ){
+   function(t){
+      t0 <- abs(t) %% (2*pi);
+      if( (t0 < pi/2) || (t0 > 3*pi/2) ){
          return(1);
       }
       else{
@@ -63,11 +63,11 @@ squareWave = makeFSApprox(
 #----------------------------------------------------------------------
 # Virutal function declarations for FSApprox class
 #----------------------------------------------------------------------
-Fn <- function(x, ...){
+Fn <- function(obj, ...){
    UseMethod("Fn");
 }
 
-getPlotParams <- function(x, ...){
+getPlotParams <- function(obj, ...){
    UseMethod("getPlotParams");
 }
 
@@ -88,14 +88,14 @@ print.FSApprox <- function(fsa){
    print(fsa$trueFn);
 }
 
-plot.FSApprox <- function(fsa,x0,x1,n){
-   x <- getSamplePoints(x0,x1,n/fsa$T0) ;
-   plot( x, Fn(fsa,n)(x), 
+plot.FSApprox <- function(fsa,t0,t1,n){
+   t <- getSamplePoints(t0,t1,n/fsa$T0) ;
+   plot( t, Fn(fsa,n)(t), 
          type='l', col="blue", 
          xlab=getPlotParams(fsa)$xlab, 
          ylab=getPlotParams(fsa)$ylab);
-   lines( x, 
-         sapply( x, fsa$trueFn),
+   lines( t, 
+         sapply( t, fsa$trueFn),
          type='l', col="red");
    legend(  "topright", 
             legend=sapply(
@@ -116,13 +116,13 @@ getPlotParams.FSApprox <- function(fsa){
 
 Fn.FSApprox <- function(fsa,N){
    return(
-      function(x){
+      function(t){
          return(
             summation(
                function(n) {
                   return(
-                     (fsa$an(n) * sin( (2 * pi * n/fsa$T0 * x) + (90 * pi / 180))) +
-                     (fsa$bn(n) * sin(  2 * pi * n/fsa$T0 * x  )) 
+                     (fsa$an(n) * sin( (2 * pi * n/fsa$T0 * t) + (90 * pi / 180))) +
+                     (fsa$bn(n) * sin(  2 * pi * n/fsa$T0 * t  )) 
                   );
                }, 
                0,N
@@ -145,12 +145,12 @@ Fn.FSApprox <- function(fsa,N){
 # a vector starting at x0 and ending at x1 that has enough sample points to plot a 
 # signal with the given frequency
 #---------------------------------------------------------------------------------------
-getSamplePoints <- function(x0, x1, frequency){
+getSamplePoints <- function(t0, t1, frequency){
    #Nyquist says to use this many samples...
-   n <- (2*frequency) * (x1 - x0);
+   n <- (2*frequency) * (t1 - t0);
    #But, Nyquist was reconstructing analog signals, not connecting dots with straight lines.
    n <- 50*n;
-   return(linspace(x0,x1,n));
+   return(linspace(t0,t1,n));
 }
 
 #---------------------------------------------------------------------------------------
