@@ -2,6 +2,9 @@
 \usepackage{dsfont}
 \usepackage{listings}
 \usepackage{caption}
+\usepackage{tikz}
+\usepackage{coffee4}
+\usetikzlibrary{shadows}
 \usetheme{CambridgeUS}
 \mode<presentation>
 \title[Exploring R]{Exploring R via Fourier Series}
@@ -45,30 +48,46 @@
 \end{frame}
 
 \begin{frame}
+   \frametitle{Quick preview of where we're headed}
+   \begin{center}
+   \begin{tikzpicture}
+      \node(img1){\includegraphics[scale=0.25]{borderedSquareWave50.pdf}};
+      \node(img2) at (img1.south east) 
+         [drop shadow={shadow xshift=-0.8ex,shadow yshift=0.8ex},fill=white,draw]
+         {\includegraphics[scale=0.25]{borderedTriangleWave3.pdf}};
+   \end{tikzpicture}
+   \end{center}
+\end{frame}
+
+\begin{frame}
    \frametitle{Fourier Series}
    \[
       \color<2->{demph-color}{x(t) = }
-         \alert<2>{a_{0}}
+         \alert<2->{a_{0}}
          \color<2->{demph-color}{+ \sum_{n=1}^{\infty}}
-         \alert<2>{a_{n}} 
+         \alert<2->{a_{n}} 
          \color<2->{demph-color}{\cos n} 
-         \alert<2>{\omega_{0}} 
+         \alert<2->{\omega_{0}} 
          \color<2->{demph-color}{t + }
-         \alert<2>{b_{n}} 
+         \alert<2->{b_{n}} 
          \color<2->{demph-color}{\sin n} 
-         \alert<2>{\omega_{0}} 
+         \alert<2->{\omega_{0}} 
          \color<2->{demph-color}{t}
    \]
-   \color<2->{demph-color}{where:}
+   \color<2->{demph-color}{where:} 
    \begin{align}
-      \alert<2>{\omega_{0}} 
-      &\color<2->{demph-color}{= 2 \pi f_{0} = \frac{2\pi}{\alert<2>{T_{0}}}} \notag \\
-      \alert<2>{a_{0}} 
-      &\color<2->{demph-color}{= \frac{1}{T_{0}} \int_{T_{0}} x(t) \, dt} \notag \\
-      \alert<2>{a_{n}} 
-      &\color<2->{demph-color}{= \frac{2}{T_{0}} \int_{T_{0}} x(t) \cos n\omega_{0}t \, dt} \notag \\
-      \alert<2>{b_{n}} 
-      &\color<2->{demph-color}{= \frac{2}{T_{0}} \int_{T_{0}} x(t) \sin n\omega_{0}t \, dt} \notag  
+      \alert<2->{\omega_{0}} 
+      &\color<2->{demph-color}{= 2 \pi f_{0} = \frac{2\pi}{\alert<2->{T_{0}}}} 
+      & &\uncover<3->{\color{black}{= }\alert<3->{C_{0}}} \notag \\
+      \alert<2->{a_{0}} 
+      &\color<2->{demph-color}{= \frac{1}{T_{0}} \int_{T_{0}} x(t) \, dt} 
+      & &\uncover<3->{\color{black}{= }\alert<3->{C_{1}} = \alert<3->{f}\color{black}{(0)}} \notag \\
+      \alert<2->{a_{n}} 
+      &\color<2->{demph-color}{= \frac{2}{T_{0}} \int_{T_{0}} x(t) \cos n\omega_{0}t \, dt} 
+      & &\uncover<3->{\color{black}{= }\alert<3->{f}\color{black}{(n)}} \notag \\
+      \alert<2->{b_{n}} 
+      &\color<2->{demph-color}{= \frac{2}{T_{0}} \int_{T_{0}} x(t) \sin n\omega_{0}t \, dt} 
+      & &\uncover<3->{\color{black}{= }\alert<3->{g}\color{black}{(n)}} \notag  
    \end{align}
 \end{frame}
 
@@ -103,12 +122,18 @@
          }
          \only<2>{
             \begin{block}{}
-               Lists are associative arrays. Like Hashes in Perl or Dictionaries in Python.
+               \begin{itemize}
+                  \item Lists are associative arrays
+                  \item Just like Hashes in Perl or Dictionaries in Python
+               \end{itemize}
             \end{block}
          }
          \only<3>{
             \begin{block}{}
-               S3 Objects are the old fashioned, type-unsafe way of doing OO in R. They are built on Lists much like Perl objects are built on Hashes.
+               \begin{itemize}
+                  \item S3 Objects are the old fashioned, type-unsafe way of doing OO in R
+                  \item They are built on Lists much like Perl objects are built on Hashes
+               \end{itemize}
             \end{block}
          }
       \end{column}
@@ -285,9 +310,9 @@ summation <- function(f, n, N){
    \begin{center}
    \begin{minipage}{100mm}
    \begin{lstlisting}
-plot.FSApprox <- function(fsa,t0,t1,n){
-   t <- getSamplePoints(t0,t1,n/fsa$T0) ;
-   plot( t, Fn(fsa,n)(t), 
+plot.FSApprox <- function(fsa,t0,t1,N){
+   t <- getSamplePoints(t0,t1,N/fsa$T0) ;
+   plot( t, Fn(fsa,N)(t), 
          type='l', col="blue", 
          xlab=getPlotParams(fsa)$xlab, 
          ylab=getPlotParams(fsa)$ylab);
@@ -296,7 +321,7 @@ plot.FSApprox <- function(fsa,t0,t1,n){
          type='l', col="red");
    legend(  "topright", 
             legend=sapply(
-               c(bquote(F[.(n)](t)), bquote(x(t))),
+               c(bquote(F[.(N)](t)), bquote(x(t))),
                as.expression
             ), 
             fill=c("blue", "red"),
@@ -351,15 +376,16 @@ plot(triangleWave, -pi/2, pi/2, 20);
    \end{figure}
 \end{frame}
 
-\begin{frame}
+\begin{frame}[fragile]
    \frametitle{Questions?}
    \begin{center}
       {\fontsize{50}{60}\selectfont ???}
    \end{center}
+   \cofeAm{0.15}{0.35}{180}{100}{75}
 \end{frame}
 
 \begin{frame}
-   \frametitle{Gibbs Phenomenon / Uniform vs. Pointwise Convergence}
+   \frametitle{Gibbs phenomenon / uniform vs. pointwise convergence}
    \begin{block}{}
       \begin{itemize}
          \item The overshoot seen at the discontinuity in our square wave will never die out (Gibbs). 

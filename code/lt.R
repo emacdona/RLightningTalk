@@ -88,9 +88,13 @@ print.FSApprox <- function(fsa){
    print(fsa$trueFn);
 }
 
-plot.FSApprox <- function(fsa,t0,t1,n){
+plot.FSApprox <- function(fsa,t0,t1,n,
+                          before=function(){}, 
+                          after=function(){})
+{
    t <- getSamplePoints(t0,t1,n/fsa$T0) ;
-   plot( t, Fn(fsa,n)(t), 
+   before();
+   p <- plot( t, Fn(fsa,n)(t), 
          type='l', col="blue", 
          xlab=getPlotParams(fsa)$xlab, 
          ylab=getPlotParams(fsa)$ylab);
@@ -105,6 +109,7 @@ plot.FSApprox <- function(fsa,t0,t1,n){
             fill=c("blue", "red"),
             y.intersp=1.5,
             bg="white");
+   after();
 }
 
 getPlotParams.FSApprox <- function(fsa){
@@ -177,5 +182,15 @@ plot(triangleWave, -pi/2, pi/2, 3);
 
 pdf("triangleWave20.pdf")
 plot(triangleWave, -pi/2, pi/2, 20);
+
+pdf("borderedSquareWave50.pdf")
+plot( squareWave,-2*pi,2*pi,50,
+      function(){par(bg="white")},
+      function(){box("figure")});
+
+pdf("borderedTriangleWave3.pdf")
+plot( triangleWave, -pi/2, pi/2, 3,
+      function(){par(bg="white")},
+      function(){box("figure")});
 
 #source('lt.R')
