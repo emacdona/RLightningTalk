@@ -7,3 +7,5 @@ tm.mp3
 tm.wav
 Rplots.pdf
 *.Rout
+.DS_Store
+._.DS_Store
